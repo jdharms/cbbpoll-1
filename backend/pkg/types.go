@@ -7,3 +7,8 @@ type Team struct {
 	Nickname   string
 	Conference string
 }
+
+type User struct {
+	Nickname string
+	IsAdmin  bool
+}

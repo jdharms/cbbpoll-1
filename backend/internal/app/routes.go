@@ -1,17 +1,13 @@
 package app
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 
 	"github.com/r-cbb/cbbpoll/internal/errors"
-	"github.com/r-cbb/cbbpoll/pkg"
+	models "github.com/r-cbb/cbbpoll/pkg"
 )
 
 func (s *Server) Routes() {
@@ -33,7 +29,7 @@ func (s *Server) handlePing() http.HandlerFunc {
 
 func (s *Server) handleAddTeam() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var newTeam pkg.Team
+		var newTeam models.Team
 		err := s.decode(w, r, &newTeam)
 		if err != nil {
 			s.respond(w, r, nil, http.StatusBadRequest)
@@ -106,76 +102,28 @@ func (s *Server) handleNewSession() http.HandlerFunc {
 			return
 		}
 
-		req, err := http.NewRequest(http.MethodGet, "https://oauth.reddit.com/api/v1/me", nil)
+		name, err := usernameFromRedditToken(authToken.AccessToken)
 		if err != nil {
-			s.respond(w, r, nil, http.StatusInternalServerError)
-			return
-		}
-		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", authToken.AccessToken))
-		req.Header.Set("User-Agent", "cbbpoll_backend/0.1.0")
-
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			s.respond(w, r, nil, http.StatusInternalServerError)
-			return
-		}
-
-		if resp.StatusCode != http.StatusOK {
-			fmt.Println(req.Header.Get("Authorization"))
-			fmt.Println(resp.Status)
-			s.respond(w, r, nil, http.StatusUnauthorized)
-			return
-		}
-
-		content, err := ioutil.ReadAll(resp.Body)
-		data := make(map[string]interface{})
-		err = json.Unmarshal(content, &data)
-		if err != nil {
-			s.respond(w, r, nil, http.StatusInternalServerError)
-			return
-		}
-
-		name, ok := data["name"].(string)
-		if !ok {
 			s.respond(w, r, nil, http.StatusInternalServerError)
 			return
 		}
 
 		// todo: get user from database; create if doesn't exist
 
-		// jwt stuff -- probably move to another function
-
-		var claims jwt.MapClaims = make(map[string]interface{})
-		claims["name"] = name
-		claims["admin"] = true
-
-		alg := jwt.GetSigningMethod("RS256")
-		keytext, err := ioutil.ReadFile("jwtRS256.key")
+		out, err := createJWT(models.User{Nickname: name, IsAdmin: true})
 		if err != nil {
-			fmt.Println("couldn't read from secret file")
-		}
-
-		key, err := jwt.ParseRSAPrivateKeyFromPEM(keytext)
-		if err != nil {
-			fmt.Println(err.Error())
-			fmt.Println("couldn't parse key from byte")
-		}
-
-		token := jwt.NewWithClaims(alg, claims)
-
-		out, err := token.SignedString(key)
-		if err != nil {
-			fmt.Printf("Error signing token: %v", err)
+			s.respond(w, r, nil, http.StatusInternalServerError)
 			return
 		}
 
-		s.respond(w, r, struct {
+		payload := struct {
 			Nickname string
 			Token string
 		}{
 			Nickname: name,
 			Token: out,
-		}, http.StatusOK)
+		}
+
+		s.respond(w, r, payload, http.StatusOK)
 	}
 }

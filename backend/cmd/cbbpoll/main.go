@@ -33,6 +33,8 @@ func main() {
 		log.Printf("\tUsing port %s from environment variable", port)
 	}
 
+	// TODO: flag to enable TLS
+
 	srv := &http.Server{
 		Handler: server.Handler(),
 		Addr:    fmt.Sprintf(":%s", port),
