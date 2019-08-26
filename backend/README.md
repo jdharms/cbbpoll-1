@@ -7,6 +7,17 @@ The easiest way to deploy the cbbpoll backend locally is using
 [docker-compose](https://docs.docker.com/compose/install/).
 
 To run the backend, `cd` to the `backend/` directory and run (without the $)
+
+```$xslt
+$ ssh-keygen -t rsa -b 4096 -m PEM -f jwtRS256.key
+# Don't add passphrase
+$ openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
+```
+
+This creates the private key required by the backend to issue
+jwt access tokens to client.
+
+Then, run:
 ```$xslt
 $ docker-compose up cbbpoll
 ```
