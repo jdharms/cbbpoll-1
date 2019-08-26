@@ -28,7 +28,7 @@ COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /etc/passwd /etc/passwd
 
 # copy private key
-COPY rsa_key.txt .
+COPY jwtRS256.key .
 
 EXPOSE 8000
 ENTRYPOINT ["/app/cbbpoll"]

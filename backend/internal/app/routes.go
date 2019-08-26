@@ -151,7 +151,7 @@ func (s *Server) handleNewSession() http.HandlerFunc {
 		claims["admin"] = true
 
 		alg := jwt.GetSigningMethod("RS256")
-		keytext, err := ioutil.ReadFile("rsa_key.txt")
+		keytext, err := ioutil.ReadFile("jwtRS256.key")
 		if err != nil {
 			fmt.Println("couldn't read from secret file")
 		}

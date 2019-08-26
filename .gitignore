@@ -22,4 +22,5 @@ yarn-error.log*
 *.sw?
 
 # Secret files
-backend/rsa_key.txt
+backend/*.key
+backend/*.pub
