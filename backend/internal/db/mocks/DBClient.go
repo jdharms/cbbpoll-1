@@ -51,3 +51,26 @@ func (_m *DBClient) GetTeam(id int64) (pkg.Team, error) {
 
 	return r0, r1
 }
+
+// GetTeams provides a mock function with given fields:
+func (_m *DBClient) GetTeams() ([]pkg.Team, error) {
+	ret := _m.Called()
+
+	var r0 []pkg.Team
+	if rf, ok := ret.Get(0).(func() []pkg.Team); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]pkg.Team)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func() error); ok {
+		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}

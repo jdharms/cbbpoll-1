@@ -1,24 +1,27 @@
 package errors
 
-type Error struct {
-	Op   Op
-	Kind Code
-	Err  error
-}
+import "fmt"
 
 type Op string
 
 type Code uint
 
+type Error struct {
+	Op   Op
+	Kind Code
+	Err  error
+	Msg  string
+}
+
 const (
 	KindUnexpected Code = iota // zero type is purposefully KindUnexpected
 	KindNotFound
 	KindConcurrencyProblem
+	KindDatabaseError
 )
 
-
 func (e Error) Error() string {
-	return e.Err.Error()
+	return fmt.Sprintf("%s: %s", e.Msg, e.Err.Error())
 }
 
 func Kind(err error) Code {

@@ -87,7 +87,7 @@ func TestAddTeam(t *testing.T) {
 				return
 			}
 
-			r := httptest.NewRequest(http.MethodPost, "/team", &buf)
+			r := httptest.NewRequest(http.MethodPost, "/teams", &buf)
 			w := httptest.NewRecorder()
 			srv.ServeHTTP(w, r)
 			if w.Result().StatusCode != test.expectedStatus {

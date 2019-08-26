@@ -47,3 +47,7 @@ func (s *Server) respond(w http.ResponseWriter, r *http.Request, data interface{
 func (s *Server) decode(w http.ResponseWriter, r *http.Request, v interface{}) error {
 	return json.NewDecoder(r.Body).Decode(v)
 }
+
+func (s Server) version() string {
+	return "v0.1.0"
+}
