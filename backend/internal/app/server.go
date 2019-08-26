@@ -3,8 +3,11 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/dgrijalva/jwt-go"
+	"io/ioutil"
 	"net/http"
 
+	"github.com/go-chi/jwtauth"
 	"github.com/gorilla/mux"
 
 	"github.com/r-cbb/cbbpoll/internal/db"
@@ -15,12 +18,38 @@ Server is a type that holds state for the app, along with routers and handlers.
 */
 type Server struct {
 	Db     db.DBClient
+	TokenAuth *jwtauth.JWTAuth
 	router *mux.Router
 }
 
 func NewServer() *Server {
 	srv := Server{}
+
+	// todo this is not the right place for all this
+	keytext, err := ioutil.ReadFile("jwtRS256.key")
+	if err != nil {
+		fmt.Println("couldn't read from secret file")
+	}
+
+	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM(keytext)
+	if err != nil {
+		fmt.Println("couldn't parse private key")
+	}
+
+	pubtext, err := ioutil.ReadFile("jwtRS256.key.pub")
+	if err != nil {
+		fmt.Println("couldn't read from public key file")
+	}
+
+	pubKey, err := jwt.ParseRSAPublicKeyFromPEM(pubtext)
+	if err != nil {
+		fmt.Println("couldn't parse public key")
+	}
+
+	srv.TokenAuth = jwtauth.New("RS256", privateKey, pubKey)
+
 	srv.Routes()
+
 	return &srv
 }
 

@@ -18,10 +18,15 @@ const (
 	KindNotFound
 	KindConcurrencyProblem
 	KindDatabaseError
+	KindNotImplemented
 )
 
 func (e Error) Error() string {
-	return fmt.Sprintf("%s: %s", e.Msg, e.Err.Error())
+	if e.Msg != "" {
+		return fmt.Sprintf("%s: %s", e.Msg, e.Err.Error())
+	}
+
+	return e.Err.Error()
 }
 
 func Kind(err error) Code {

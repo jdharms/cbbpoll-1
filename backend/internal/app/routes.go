@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/go-chi/jwtauth"
 	"github.com/gorilla/mux"
 
 	"github.com/r-cbb/cbbpoll/internal/errors"
@@ -12,11 +13,17 @@ import (
 
 func (s *Server) Routes() {
 	s.router = mux.NewRouter()
+
+	// todo: add auth middleware outside of Routes() function
+	s.router.Use(jwtauth.Verifier(s.TokenAuth))
+	// s.router.Use(jwtauth.Authenticator)
+
 	s.router.HandleFunc("/", s.handlePing())
 	s.router.HandleFunc("/ping", s.handlePing())
 	s.router.HandleFunc("/teams", s.handleAddTeam()).Methods(http.MethodPost)
 	s.router.HandleFunc("/teams", s.handleListTeams()).Methods(http.MethodGet)
 	s.router.HandleFunc("/teams/{id:[0-9]+}", s.handleGetTeam()).Methods(http.MethodGet)
+	s.router.HandleFunc("/users/me", s.handleUsersMe())
 
 	s.router.HandleFunc("/sessions", s.handleNewSession()).Methods(http.MethodPost)
 }
@@ -91,11 +98,19 @@ func (s *Server) handleListTeams() http.HandlerFunc {
 	}
 }
 
+func (s *Server) handleUsersMe() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		_, claims, _ := jwtauth.FromContext(r.Context())
+		s.respond(w, r, claims["name"], http.StatusOK)
+	}
+}
+
 func (s *Server) handleNewSession() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		authToken := struct {
+		var authToken struct {
 			AccessToken string
-		} {}
+		}
+
 		err := s.decode(w, r, &authToken)
 		if err != nil {
 			s.respond(w, r, nil, http.StatusBadRequest)
@@ -108,9 +123,19 @@ func (s *Server) handleNewSession() http.HandlerFunc {
 			return
 		}
 
-		// todo: get user from database; create if doesn't exist
+		user, err := s.Db.GetUser(name)
+		if errors.Kind(err) == errors.KindNotFound {
+			user = models.User{
+				Nickname: name,
+				IsAdmin: false,
+			}
+			_, err := s.Db.AddUser(user)
+			if err != nil {
 
-		out, err := createJWT(models.User{Nickname: name, IsAdmin: true})
+			}
+		}
+
+		out, err := createJWT(models.User{Nickname: user.Nickname, IsAdmin: user.IsAdmin})
 		if err != nil {
 			s.respond(w, r, nil, http.StatusInternalServerError)
 			return

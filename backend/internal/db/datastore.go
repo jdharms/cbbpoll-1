@@ -159,3 +159,13 @@ func (db *DatastoreClient) GetTeams() (teams []pkg.Team, err error) {
 
 	return
 }
+
+func (db *DatastoreClient) GetUser(name string) (user pkg.User, err error) {
+	const op errors.Op = "datastore.GetUser"
+	return pkg.User{}, errors.E(op, errors.KindNotFound, fmt.Errorf("datastore.GetUser() not implemented"))
+}
+
+func (db *DatastoreClient) AddUser(user pkg.User) (name string, err error) {
+	const op errors.Op = "datastore.AddUser"
+	return "", errors.E(op, errors.KindNotImplemented, fmt.Errorf("datastore.AddUser() not implemented"))
+}

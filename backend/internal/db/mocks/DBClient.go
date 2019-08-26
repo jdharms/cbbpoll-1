@@ -31,6 +31,27 @@ func (_m *DBClient) AddTeam(team pkg.Team) (int64, error) {
 	return r0, r1
 }
 
+// AddUser provides a mock function with given fields: user
+func (_m *DBClient) AddUser(user pkg.User) (string, error) {
+	ret := _m.Called(user)
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func(pkg.User) string); ok {
+		r0 = rf(user)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(pkg.User) error); ok {
+		r1 = rf(user)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetTeam provides a mock function with given fields: id
 func (_m *DBClient) GetTeam(id int64) (pkg.Team, error) {
 	ret := _m.Called(id)
@@ -68,6 +89,27 @@ func (_m *DBClient) GetTeams() ([]pkg.Team, error) {
 	var r1 error
 	if rf, ok := ret.Get(1).(func() error); ok {
 		r1 = rf()
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetUser provides a mock function with given fields: name
+func (_m *DBClient) GetUser(name string) (pkg.User, error) {
+	ret := _m.Called(name)
+
+	var r0 pkg.User
+	if rf, ok := ret.Get(0).(func(string) pkg.User); ok {
+		r0 = rf(name)
+	} else {
+		r0 = ret.Get(0).(pkg.User)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(string) error); ok {
+		r1 = rf(name)
 	} else {
 		r1 = ret.Error(1)
 	}
