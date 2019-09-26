@@ -1,6 +1,6 @@
 on: push
-name: My cool Action
-job:
+name: Golang Action
+jobs:
   checks:
     name: run
     runs-on: ubuntu-latest
