@@ -25,6 +25,6 @@ jobs:
         with:
           args: go vet ./...
         env:
-          PROJECT_PATH: ".backend"
+          PROJECT_PATH: "./backend"
           GO111MODULE: "on"
           IMPORT: "r-cb/cbbpoll"
