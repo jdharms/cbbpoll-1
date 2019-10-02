@@ -1,11 +1,9 @@
 package db
 
 import (
+	"cloud.google.com/go/datastore"
 	"context"
 	"fmt"
-	"time"
-
-	"cloud.google.com/go/datastore"
 
 	"github.com/r-cbb/cbbpoll/internal/errors"
 	"github.com/r-cbb/cbbpoll/internal/models"
@@ -236,10 +234,10 @@ func (db *DatastoreClient) UpdateUser(user models.User) error {
 		return errors.E(op, "user not found to update", errors.KindNotFound, err)
 	}
 
-	user.VoterEvents = oldUser.VoterEvents
-	if user.IsVoter != oldUser.IsVoter {
-		user.VoterEvents = append([]models.VoterEvent{{user.IsVoter, time.Now()}}, oldUser.VoterEvents...)
-	}
+	// user.VoterEvents = oldUser.VoterEvents
+	// if user.IsVoter != oldUser.IsVoter {
+	// 	user.VoterEvents = append([]models.VoterEvent{{user.IsVoter, time.Now()}}, oldUser.VoterEvents...)
+	// }
 
 	_, err = tx.Put(k, &user)
 	if err != nil {

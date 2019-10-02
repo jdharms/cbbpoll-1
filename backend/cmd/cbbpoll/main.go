@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/r-cbb/cbbpoll/internal/db/sqlite"
 	"log"
 	"net/http"
 	"os"
@@ -12,7 +13,6 @@ import (
 	_ "github.com/r-cbb/cbbpoll/docs"
 	"github.com/r-cbb/cbbpoll/internal/app"
 	"github.com/r-cbb/cbbpoll/internal/auth"
-	"github.com/r-cbb/cbbpoll/internal/db"
 	"github.com/r-cbb/cbbpoll/internal/server"
 )
 
@@ -24,7 +24,8 @@ func main() {
 	var err error
 
 	// Setup Datastore connection
-	db, err := db.NewDatastoreClient("cbbpoll")
+	// db, err := db.NewDatastoreClient("cbbpoll")
+	db, err := sqlite.NewClient("foo")
 	if err != nil {
 		log.Fatal(err.Error())
 		panic(err.Error())

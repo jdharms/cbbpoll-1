@@ -28,7 +28,6 @@ type User struct {
 	IsAdmin bool `json:"is_admin"`
 	// example: true
 	IsVoter     bool         `json:"is_voter"`
-	VoterEvents []VoterEvent `json:"voter_events,omitempty"`
 }
 
 type VoterEvent struct {
